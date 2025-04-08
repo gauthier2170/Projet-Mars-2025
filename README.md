@@ -41,4 +41,22 @@ for instruction in examples:
     print("\n", instruction)
     print(output)
 ```
-efaervav
+# 💡 Projet GPT-2 - Fine-tuning en français
+
+Ce projet montre comment fine-tuner GPT-2 sur des textes en français, à l'aide de Hugging Face.
+
+---
+
+## 📄 Télécharger le code en PDF
+
+👉 [Clique ici pour ouvrir le PDF contenant le code](1ER%20partie%20gpt-2.pdf)
+
+---
+
+## 🔍 Partie 1 : Chargement et préparation des données
+
+### 🧪 Installation
+
+```bash
+!pip install torch datasets transformers tqdm matplotlib
+
