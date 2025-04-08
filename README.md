@@ -13,23 +13,25 @@ On utilise ici le dataset `rayml/french_gutenberg`, qui contient des livres trad
 ### 🧪 Installation des bibliothèques nécessaires
 
 ```bash
-pip install torch datasets transformers tqdm matplotlib
-tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-tokenizer.pad_token = tokenizer.eos_token
+!pip install transformers torch
 
-def tokenize(element):
-    return tokenizer(element["text"])
-
-dataset = dataset.map(tokenize, batched=True, remove_columns=["text"])
-def group_texts(examples):
-    concatenated = sum(examples["input_ids"], [])
-    total_len = (len(concatenated) // SEQUENCE_LENGTH) * SEQUENCE_LENGTH
-    result = [
-        concatenated[i : i + SEQUENCE_LENGTH]
-        for i in range(0, total_len, SEQUENCE_LENGTH)
-    ]
-    return {"input_ids": result, "labels": result}
-
-dataset = dataset.map(group_texts, batched=True)
----
-vrevervesrvre
+ [ ]: from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+ import torch
+ model_name = "gpt2-medium"
+ tokenizer = AutoTokenizer.from_pretrained(model_name)
+ tokenizer.pad_token = tokenizer.eos_token
+ model = AutoModelForCausalLM.from_pretrained(model_name)
+ model.eval()
+ model.to("cuda" if torch.cuda.is_available() else "cpu")
+ generator = pipeline("text-generation", model=model, tokenizer=tokenizer,␣
+ ↪device=0 if torch.cuda.is_available() else-1)
+ examples = [
+ "What is the capital of France?",
+ "What are the three primary colors?",
+ "What does DNA stand for?"
+ ]
+ for instruction in examples:
+ prompt = f"Instruction: {instruction}\nRéponse:"
+ output = generator(prompt, max_new_tokens=60)[0]["generated_text"]
+ print("\n", instruction)
+ print(output)
