@@ -1,4 +1,4 @@
-# 💡 Projet GPT-2 - Fine-tuning en français
+# 💡 Projet GPT-2 - Fine-tuning 
 
 Ce projet montre comment fine-tuner GPT-2 sur des textes en français, à l'aide de Hugging Face.
 
