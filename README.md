@@ -40,3 +40,4 @@ for instruction in examples:
     output = generator(prompt, max_new_tokens=60)[0]["generated_text"]
     print("\n", instruction)
     print(output)
+```
