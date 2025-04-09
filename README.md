@@ -35,7 +35,7 @@ generator = pipeline("text-generation", model=model, tokenizer=tokenizer, device
 examples = [
     "What is the capital of France?",
     "What are the three primary colors?",
-    "Traduit la phrase : What happened ?",
+    "Traduit : What happened ?",
     "Give three tips for staying healthy."    
 ]
 
