@@ -48,7 +48,7 @@ for instruction in examples:
 
 ## Partie 2 : Charger le dataset et le tokenizer
 
-
+Maintenant, nous allons télécharger le dataset de Alpaca disponible sur Hugging Face Datasets. C'est un dataset avec des questions simples et des réponses assez courtes. Nous utiliserons seulement les colonnes instruction et output, qui correspond aux réponsent des instructions. Nous nous intéressons seulement à ces deux colonnes car les autres ne sont pas utiles pour notre projet. De plus, nous réduisons les réponses à 80 mots maximums pour éviter au modèle de se perdre dans des réponses trop longues et cela permet d'accélérer l'entrainement. Nous voulons poser des questions et avoir des réponses qui ressemble à celles du dataset. 
 
 ---
 
@@ -67,6 +67,10 @@ def is_simple(example):
 
 dataset = dataset.filter(is_simple)
 ```
+
+Ce qui est important dans cette étape c'est de bien réaliser la tokenisation, il faut l'adapter à notre dataset et comment on veut l'utiliser. C'est pour cela que l'on créer un prompt au format Alpaca avec instruction et réponse. Puis, nous le passons dans le tokenizer avec une limite de 128 tokens car les questions et réponses sont courtes et cela permet d'acccelérer l'entrainement. Enfin, on applique la tokenization sur le dataset et on obtient le texte tokenizé appelé dans le code tokenized_dataset. 
+
+---
 
 ```bash
 from transformers import AutoTokenizer
