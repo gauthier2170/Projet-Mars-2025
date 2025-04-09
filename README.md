@@ -1,10 +1,13 @@
-# Projet GPT-2 - Fine-tuning
+# Projet : Aligner GPT-2 pour en faire un assistant (Instruction Tuning)
 
-Ce projet montre comment fine-tuner GPT-2 sur des textes en français, à l'aide de Hugging Face.
+L'objectif de ce projet est de transformer un modèle de langage tel que GPT-2 en un assistant qui sera capable de répondre à des questions. 
+Pour cela, on va utiliser GPT-2 et nous allons le fine-tuner avec un dataset (Alpaca) et un apprentissage efficace via LoRA (Low-Rank Adaptation).
+Tout d'abord, nous chargerons et nous testerons le modèle gpt2-medium. Puis, nous téléchargerons un dataset et nous le tokeniserons. 
+Ensuite, nous ferons un fine-tuning avec LoRa. Enfin, nous comparerons les réponses des modèles avant et après le fine-tuning. 
 
 ---
 
-## Partie 1 : Chargement et préparation des données
+## Partie 1 : Chargement gpt2-medium et test
 
 On utilise ici le dataset `rayml/french_gutenberg`, qui contient des livres traduits en français issus du projet Gutenberg.
 
