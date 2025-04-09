@@ -9,7 +9,7 @@ Ensuite, nous ferons un fine-tuning avec LoRa. Enfin, nous comparerons les répo
 
 ## Partie 1 : Chargement gpt2-medium et test
 
-On utilise ici le dataset `rayml/french_gutenberg`, qui contient des livres traduits en français issus du projet Gutenberg.
+
 
 ---
 
