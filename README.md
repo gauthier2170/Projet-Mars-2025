@@ -9,11 +9,11 @@ Ensuite, nous ferons un fine-tuning avec LoRa. Enfin, nous comparerons les répo
 
 ## Partie 1 : Chargement gpt2-medium et test
 
-
+Tout d'abord, nous voulons tester un modèle de GPT-2, gpt2-medium. Nous allons générer des questions ou des instructions précisent avec des prompts et nous voudrions savoir si ce modèle y répond correctement. 
+Nous allons constater que ce n'est pas le cas et que cela répond soit des mots qui ne forment même pas une phrase ou bien cela répète la question posée. 
+Le code permet de charger gpt-2 medium et son tokenizer. Il y a aussi la création de pipeline afin de générer du texte automatiquement à partir des prompts.
 
 ---
-
-### Installation des bibliothèques nécessaires
 
 ```bash
 !pip install transformers torch
@@ -35,7 +35,8 @@ generator = pipeline("text-generation", model=model, tokenizer=tokenizer, device
 examples = [
     "What is the capital of France?",
     "What are the three primary colors?",
-    "What does DNA stand for?"
+    "Traduit la phrase : What happened ?",
+    "Give three tips for staying healthy."    
 ]
 
 for instruction in examples:
@@ -44,6 +45,13 @@ for instruction in examples:
     print("\n", instruction)
     print(output)
 ```
+
+## Partie 2 : Charger le dataset et le tokenizer
+
+
+
+---
+
 ```bash
 !pip install datasets
 
