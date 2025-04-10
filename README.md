@@ -1,17 +1,12 @@
 # Projet : Aligner GPT-2 pour en faire un assistant (Instruction Tuning)
 
-L'objectif de ce projet est de transformer un modèle de langage tel que GPT-2 en un assistant qui sera capable de répondre à des questions. 
-Pour cela, on va utiliser GPT-2 et nous allons le fine-tuner avec un dataset (Alpaca) et un apprentissage efficace via LoRA (Low-Rank Adaptation).
-Tout d'abord, nous chargerons et nous testerons le modèle gpt2-medium. Puis, nous téléchargerons un dataset et nous le tokeniserons. 
-Ensuite, nous ferons un fine-tuning avec LoRa. Enfin, nous comparerons les réponses des modèles avant et après le fine-tuning. 
+L'objectif de ce projet est de transformer un modèle de langage tel que GPT-2 en un assistant qui sera capable de répondre à des questions. Pour cela, nous allons utiliser GPT-2 et puis nous le fine-tunerons avec un dataset (Alpaca) et un apprentissage efficace via LoRA (Low-Rank Adaptation). Tout d'abord, nous chargerons et nous testerons le modèle gpt2-medium. Puis, nous téléchargerons un dataset et nous le tokeniserons. Ensuite, nous ferons un fine-tuning avec LoRA. Enfin, nous comparerons les réponses des modèles avant et après le fine-tuning.
 
 ---
 
 ## Partie 1 : Chargement gpt2-medium et test
 
-Tout d'abord, nous voulons tester un modèle de GPT-2, gpt2-medium. Nous allons générer des questions ou des instructions précisent avec des prompts et nous voudrions savoir si ce modèle y répond correctement. 
-Nous allons constater que ce n'est pas le cas et que cela répond soit des mots qui ne forment même pas une phrase ou bien cela répète la question posée. 
-Le code permet de charger gpt-2 medium et son tokenizer. Il y a aussi la création de pipeline afin de générer du texte automatiquement à partir des prompts.
+Tout d'abord, nous voulons tester un modèle de GPT-2, gpt2-medium. Nous allons générer des questions ou des instructions précises avec des prompts, et nous voudrions savoir si ce modèle y répond correctement. Nous allons constater que ce n’est pas le cas : soit il génère des mots qui ne forment même pas une phrase, soit il répète simplement la question posée. Le code permet de charger gpt2-medium ainsi que son tokenizer. Il inclut également la création d’un pipeline afin de générer automatiquement du texte à partir des prompts.
 
 ---
 
@@ -49,7 +44,8 @@ for instruction in examples:
 ## Partie 2 : Charger le dataset et le tokenizer
 ### 2.1. Dataset
 
-Maintenant, nous allons télécharger le dataset de Alpaca disponible sur Hugging Face Datasets. C'est un dataset avec des questions simples et des réponses assez courtes. Nous utiliserons seulement les colonnes instruction et output, qui correspond aux réponsent des instructions. Nous nous intéressons seulement à ces deux colonnes car les autres ne sont pas utiles pour notre projet. De plus, nous réduisons les réponses à 80 mots maximums pour éviter au modèle de se perdre dans des réponses trop longues et cela permet d'accélérer l'entrainement. Nous voulons poser des questions et avoir des réponses qui ressemble à celles du dataset. 
+Maintenant, nous allons télécharger le dataset Alpaca, disponible sur Hugging Face Datasets. C’est un dataset contenant des questions simples et des réponses assez courtes. Nous utiliserons seulement les colonnes instruction et output, cette dernière correspondant aux réponses des instructions. Nous nous concentrons uniquement sur ces deux colonnes, car les autres ne sont pas utiles pour notre projet.
+De plus, nous limitons les réponses à 80 mots maximum afin d’éviter que le modèle ne se perde dans des réponses trop longues, et cela permet également d’accélérer l’entraînement. L’objectif est de poser des questions et d’obtenir des réponses similaires à celles présentes dans le dataset.
 
 ---
 
@@ -71,7 +67,10 @@ dataset = dataset.filter(is_simple)
 
 ### 2.2. Tokenizer
 
-Ce qui est important dans cette étape c'est de bien réaliser la tokenisation, il faut l'adapter à notre dataset et comment on veut l'utiliser. C'est pour cela que l'on créer un prompt au format Alpaca avec instruction et réponse. Puis, nous le passons dans le tokenizer avec une limite de 128 tokens car les questions et réponses sont courtes et cela permet d'acccelérer l'entrainement. Enfin, on applique la tokenization sur le dataset et on obtient le texte tokenizé appelé dans le code tokenized_dataset. 
+Ce qui est important dans cette étape, c’est de bien réaliser la tokenisation : il faut l’adapter à notre dataset et à la manière dont nous voulons l’utiliser. C’est pour cela que nous créons un prompt au format Alpaca, avec une instruction suivie de sa réponse.
+Ensuite, nous le passons dans le tokenizer avec une limite de 128 tokens, car les questions et réponses sont courtes, ce qui permet d’accélérer l’entraînement. Enfin, nous appliquons la tokenisation sur le dataset, et nous obtenons le texte tokenisé, appelé tokenized_dataset dans le code.
+
+
 
 ---
 
@@ -153,7 +152,8 @@ tokenizer.save_pretrained(output_dir)
 ## Partie 4 : Comparaison des réponses
 ### 4.1. Premier prompt de vérification
 
-Dans un premier temps, nous avons réalisé un premier prompt avec une seule question afin de vérifier que le fine-tuning et la sauvegarde avaient bien fonctionné. Nous avons avons posé une question par rapport au modèle sur lequel on l'a entrainé. De plus, on utilise de nouveau un pipeline de génération de texte de Hugging Face. Enfin, quand on lance la génération de la réponse, on peut contrôler plusieurs choses, les plus importantes sont par exemple le nombre de tokens maximals pour éviter les réponses trop longue (ici 80 tokens), la température permet de gérer la créativité des réponses. 
+Dans un premier temps, nous avons réalisé un premier prompt avec une seule question afin de vérifier que le fine-tuning et la sauvegarde avaient bien fonctionné. Nous avons posé une question en lien avec le modèle sur lequel l'entraînement a été effectué.
+De plus, nous utilisons à nouveau un pipeline de génération de texte de Hugging Face. Enfin, lors de la génération de la réponse, plusieurs paramètres peuvent être contrôlés. Les plus importants sont, par exemple, le nombre maximal de tokens (ici 80) pour éviter des réponses trop longues, ainsi que la température, qui permet de gérer la créativité des réponses.
 
 ---
 
@@ -179,7 +179,7 @@ print(result)
 
 ### 4.2. Comparaison avant/après fine-tuning
 
-Maintenant, nous allons comparer les réponses générées par deux modèles : gpt-2 medium et gpt-2 medium fine-tuné avec LoRa sur le dataset Alpaca. Nous cherchons à savoir si le fine-tuning a été de qualité ou non sur les questions que l'on va poser du dataset Alpaca. Tout d'abord, nous avons posé plusieurs questions provenant du datset avec des instructions différentes. Ensuite, on a encore la partie avec les paramètres qu'il faut bien réglés pour avoir un meilleur contrôle. Puis, on charge tous nos modèles qu'on veut tester ici, c'est à dire le modèle fine-tuné et celui qui ne l'est pas. Enfin, on génère les réponses avec l'outil pipeline de Hugging Face puis on peut lancer les comparaisons. Nous avons posé la question et mis la réponse de gpt-2 medium puis celle avec le fine-tuning pour observer les différences. On a pu constater que le modèle de base répond de manière très aléatoire, les mots s'enchainent mais la phrase ne veut rien dire et parfois il répète plusieurs fois les mêmes mots à la suite. Par contre, le modèle fine-tuné est cohérent, il commence par nous répondre à notre question et donne d'autres informations en plus qui sont pertinentes par rapport à la question. Cependant, ses réponses sont parfois très longues et perdent de la clartée au bout d'un moment, c'est pour cela que nous avons réduit le nombre de mots maximums des réponses. On en conclu que le fine-tuning est fonctionnel puisqu'il est pertinent, claire et utile dans beaucoup de situation de questions/réponses style Alpaca. 
+Maintenant, nous allons comparer les réponses générées par deux modèles : gpt2-medium et gpt2-medium fine-tuné avec LoRA sur le dataset Alpaca. Nous cherchons à savoir si le fine-tuning a été efficace ou non sur les questions issues du dataset Alpaca. Tout d’abord, nous avons posé plusieurs questions provenant du dataset, avec des instructions variées. Ensuite, nous avons à nouveau ajusté les paramètres de génération pour mieux contrôler les réponses. Puis, nous avons chargé les deux modèles que nous souhaitons tester : le modèle fine-tuné et le modèle d’origine. Enfin, nous avons généré les réponses à l’aide du pipeline de Hugging Face, ce qui nous a permis de lancer une comparaison. Pour chaque question, nous avons noté la réponse du modèle gpt2-medium sans fine-tuning, puis celle du modèle fine-tuné, afin d’observer les différences. Nous avons constaté que le modèle de base répond de manière très aléatoire : les mots s’enchaînent sans former de phrases cohérentes, et il arrive qu’il répète plusieurs fois les mêmes mots. En revanche, le modèle fine-tuné est bien plus cohérent : il répond à la question posée, et fournit même parfois des informations supplémentaires pertinentes. Cependant, ses réponses sont parfois trop longues et perdent en clarté. C’est pour cette raison que nous avons limité le nombre maximal de mots par réponse. Nous en concluons que le fine-tuning est fonctionnel, car il produit des réponses pertinentes, claires et utiles dans de nombreuses situations de type question/réponse, comme dans le style du dataset Alpaca.
 
 ```bash
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
@@ -236,7 +236,9 @@ for instr in eval_instructions:
 
 ### 4.3. Interface de questions/réponses 
 
-Cette interface interactive permet de répondre aux questions qu'on lui pose sur le dataset Alpaca en utilisant notre modèle fine-tuné GPT-2 avec LoRa. En effet, vous allez avoir une barre où vous pouvez taper votre question (dataset Alpaca) et obtenir une réponse immédiate à celle-ci. On peut le faire un grand nombre de fois et lorsque vous voulez vous arrêter il suffit de taper exit dans la barre. Cela permet une assistance IA facile d'utilisation et qui obtient de bon résultats de réponse clair et pertinente.  
+Cette interface interactive permet de répondre aux questions posées sur le dataset Alpaca, en utilisant notre modèle GPT-2 fine-tuné avec LoRA. En effet, une barre de saisie est disponible pour taper votre question (au format du dataset Alpaca) et obtenir une réponse immédiate. Il est possible de poser un grand nombre de questions, et lorsque vous souhaitez arrêter, il suffit de taper "exit" dans la barre. Cette interface permet ainsi une assistance IA facile à utiliser, produisant des réponses claires, pertinentes et de bonne qualité.
+
+
 
 
 ```bash
