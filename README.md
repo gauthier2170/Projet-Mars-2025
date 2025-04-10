@@ -47,6 +47,7 @@ for instruction in examples:
 ```
 
 ## Partie 2 : Charger le dataset et le tokenizer
+### 2.1. Dataset
 
 Maintenant, nous allons télécharger le dataset de Alpaca disponible sur Hugging Face Datasets. C'est un dataset avec des questions simples et des réponses assez courtes. Nous utiliserons seulement les colonnes instruction et output, qui correspond aux réponsent des instructions. Nous nous intéressons seulement à ces deux colonnes car les autres ne sont pas utiles pour notre projet. De plus, nous réduisons les réponses à 80 mots maximums pour éviter au modèle de se perdre dans des réponses trop longues et cela permet d'accélérer l'entrainement. Nous voulons poser des questions et avoir des réponses qui ressemble à celles du dataset. 
 
@@ -67,6 +68,8 @@ def is_simple(example):
 
 dataset = dataset.filter(is_simple)
 ```
+
+### 2.2. Tokenizer
 
 Ce qui est important dans cette étape c'est de bien réaliser la tokenisation, il faut l'adapter à notre dataset et comment on veut l'utiliser. C'est pour cela que l'on créer un prompt au format Alpaca avec instruction et réponse. Puis, nous le passons dans le tokenizer avec une limite de 128 tokens car les questions et réponses sont courtes et cela permet d'acccelérer l'entrainement. Enfin, on applique la tokenization sur le dataset et on obtient le texte tokenizé appelé dans le code tokenized_dataset. 
 
@@ -141,6 +144,13 @@ trainer.train()
 model.save_pretrained(output_dir)
 tokenizer.save_pretrained(output_dir)
 ```
+
+## Partie 4 : Comparaison des réponses
+### 4.1. Premier prompt de vérification
+
+Dans un premier temps, nous avons réalisé un premier prompt avec une seule question afin de vérifier que le fine-tuning et la sauvegarde avaient bien fonctionné. Nous avons avons posé une question par rapport au modèle sur lequel on l'a entrainé. De plus, on utilise de nouveau un pipeline de génération de texte de Hugging Face. Enfin, quand on lance la génération de la réponse, on peut contrôler plusieurs choses, les plus importantes sont par exemple le nombre de tokens maximals pour éviter les réponses trop longue (ici 80 tokens), la température permet de gérer la créativité des réponses. 
+
+---
 
 ```bash
 from transformers import pipeline
