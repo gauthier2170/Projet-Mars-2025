@@ -97,6 +97,9 @@ base_model.resize_token_embeddings(len(tokenizer))  # Pour intégrer le token de
 ```
 # Partie Quentin sur la config de LoRa
 
+## Partie 3 : Fine-tuning avec LoRa
+### 3.1. Configuration de LoRa
+
 ---
 ```bash
 from peft import get_peft_model, LoraConfig, TaskType
@@ -113,6 +116,8 @@ lora_config = LoraConfig(
 model = get_peft_model(base_model, lora_config)
 ```
 # Partie Quentin sur le trainer
+### 3.2. L'entraimenent
+
 ---
 ```bash
 from transformers import TrainingArguments, Trainer, DataCollatorForLanguageModeling
@@ -231,7 +236,7 @@ for instr in eval_instructions:
 
 ### 4.3. Interface de questions/réponses 
 
-Cette petite interface 
+Cette interface interactive permet de répondre aux questions qu'on lui pose sur le dataset Alpaca en utilisant notre modèle fine-tuné GPT-2 avec LoRa. En effet, vous allez avoir une barre où vous pouvez taper votre question (dataset Alpaca) et obtenir une réponse immédiate à celle-ci. On peut le faire un grand nombre de fois et lorsque vous voulez vous arrêter il suffit de taper exit dans la barre. Cela permet une assistance IA facile d'utilisation et qui obtient de bon résultats de réponse clair et pertinente.  
 
 
 ```bash
