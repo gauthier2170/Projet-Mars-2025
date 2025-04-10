@@ -172,6 +172,10 @@ print("\n Réponse générée :\n")
 print(result)
 ```
 
+### 4.2. Comparaison avant/après fine-tuning
+
+Maintenant, nous allons comparer les réponses générées par deux modèles : gpt-2 medium et gpt-2 medium fine-tuné avec LoRa sur le dataset Alpaca. Nous cherchons à savoir si le fine-tuning a été de qualité ou non sur les questions que l'on va poser du dataset Alpaca. Tout d'abord, nous avons posé plusieurs questions provenant du datset avec des instructions différentes. Ensuite, on a encore la partie avec les paramètres qu'il faut bien réglés pour avoir un meilleur contrôle. Puis, on charge tous nos modèles qu'on veut tester ici, c'est à dire le modèle fine-tuné et celui qui ne l'est pas. Enfin, on génère les réponses avec l'outil pipeline de Hugging Face puis on peut lancer les comparaisons. Nous avons posé la question et mis la réponse de gpt-2 medium puis celle avec le fine-tuning pour observer les différences. On a pu constater que le modèle de base répond de manière très aléatoire, les mots s'enchainent mais la phrase ne veut rien dire et parfois il répète plusieurs fois les mêmes mots à la suite. Par contre, le modèle fine-tuné est cohérent, il commence par nous répondre à notre question et donne d'autres informations en plus qui sont pertinentes par rapport à la question. Cependant, ses réponses sont parfois très longues et perdent de la clartée au bout d'un moment, c'est pour cela que nous avons réduit le nombre de mots maximums des réponses. On en conclu que le fine-tuning est fonctionnel puisqu'il est pertinent, claire et utile dans beaucoup de situation de questions/réponses style Alpaca. 
+
 ```bash
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
@@ -224,6 +228,11 @@ for instr in eval_instructions:
     print(ft_resp.replace(prompt, "").strip())
     print("="*80)
 ```
+
+### 4.3. Interface de questions/réponses 
+
+Cette petite interface 
+
 
 ```bash
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
