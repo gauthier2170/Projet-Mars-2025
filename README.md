@@ -94,10 +94,12 @@ from transformers import AutoModelForCausalLM
 base_model = AutoModelForCausalLM.from_pretrained("gpt2-medium")
 base_model.resize_token_embeddings(len(tokenizer))  # Pour intégrer le token de padding
 ```
-# Partie Quentin sur la config de LoRa
 
 ## Partie 3 : Fine-tuning avec LoRa
 ### 3.1. Configuration de LoRa
+
+Dans cette partie, nous allons configurer le fine-tuning de notre modèle GPT- avec la méthode LoRA (Low-Rank Adaptation), via la bibliothèque peft. On crée une configuration LoraConfig pour appliquer LoRA sur les modules d’attention ("c_attn") avec des paramètres spécifiques (rang = 8, alpha = 16, dropout = 0.1).
+Le modèle de base (base_model) est ensuite modifié grâce à get_peft_model() pour n’entraîner qu’une petite partie des poids, ce qui permet un fine-tuning plus léger, rapide et économique.
 
 ---
 ```bash
@@ -114,8 +116,12 @@ lora_config = LoraConfig(
 
 model = get_peft_model(base_model, lora_config)
 ```
-# Partie Quentin sur le trainer
+
 ### 3.2. L'entraimenent
+
+Ce code configure et lance l’entraînement du modèle modifié avec LoRA à l’aide de la classe Trainer de Hugging Face. Les paramètres d’entraînement (batch size, learning rate, nombre d’époques, etc.) sont définis via TrainingArguments.
+On utilise un DataCollator adapté au language modeling causal (GPT-like), puis on entraîne le modèle sur un dataset tokenisé avec trainer.train(). L'entraînement est optimisé pour tourner sur GPU si disponible, et le modèle est sauvegardé à la fin de chaque époque.
+
 
 ---
 ```bash
