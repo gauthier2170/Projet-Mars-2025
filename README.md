@@ -96,10 +96,19 @@ base_model.resize_token_embeddings(len(tokenizer))  # Pour intégrer le token de
 ```
 
 ## Partie 3 : Fine-tuning avec LoRa
-### 3.1. Configuration de LoRa
 
-Dans cette partie, nous allons configurer le fine-tuning de notre modèle GPT- avec la méthode LoRA (Low-Rank Adaptation), via la bibliothèque peft. On crée une configuration LoraConfig pour appliquer LoRA sur les modules d’attention ("c_attn") avec des paramètres spécifiques (rang = 8, alpha = 16, dropout = 0.1).
-Le modèle de base (base_model) est ensuite modifié grâce à get_peft_model() pour n’entraîner qu’une petite partie des poids, ce qui permet un fine-tuning plus léger, rapide et économique.
+### 3.1. Explication générale de cette méthode de fine-tuning
+
+
+La méthode LoRA est une technique efficace de fine-tuning de modèles de langage, qui consiste à ne pas modifier les poids d’origine du modèle (W matrice de taille dxd), mais à apprendre une correction légère sous forme de deux matrices A et B (respectivement de taille dxr et rxd). Plutôt que de recalculer l’intégralité des paramètres du modèle  souvent très volumineux  LoRA introduit ces deux petites matrices dont le produit  A.B (de taille dxd) constitue une mise à jour ΔW appliquée à la matrice d’origine. Ces matrices sont les seules à être entraînées, ce qui réduit drastiquement le nombre de paramètres à optimiser et accélère le processus d’apprentissage. En effet, d est bien supérieur à r il va donc nous falloir optimiser 2.r.d paramètres au lieu de d.d qui est un nombre bien plus important de paramètres. 
+
+Le processus d’apprentissage consiste alors à ajuster les coefficients de A et B afin de minimiser la fonction de perte, qui mesure l’écart entre les prédictions du modèle et les réponses correctes, contenues dans le dataset d’entraînement. Cette fonction de perte va être calculer avec la méthode de Cross Enthropie. À chaque itération, le modèle prédit une réponse, qu’on compare à la vérité issue du dataset. La différence entre les deux est quantifiée par la fonction de perte, ensuite la descente de gradient ajuste progressivement les coefficients des matrices A et B pour que le modèle s’améliore. Une fois entraînées, ces matrices contiennent les coefficients optimaux qui permettent de minimiser notre fonction de perte et permettent au modèle de générer des prédictions précises pour la tâche demandée.
+
+---
+
+### 3.2. Configuration de LoRa
+
+Dans cette partie, nous allons configurer le fine-tuning de notre modèle GPT avec la méthode LoRA (Low-Rank Adaptation) à l’aide de la bibliothèque peft. Pour cela, on définit une configuration via la classe LoraConfig, qui permet de spécifier précisément comment et où appliquer LoRA. On y retrouve plusieurs paramètres clés : le rang r (ici fixé à 8), qui détermine la taille des matrices de décomposition basse-rang A et B; un rang plus petit signifie moins de paramètres à entraîner, mais aussi une capacité d’adaptation plus limitée. Le paramètre lora_alpha (valeur ici de 16) joue le rôle de facteur de mise à l’échelle, amplifiant ou atténuant l’effet de la mise à jour A.B. Le dropout (fixé à 0.1) permet de régulariser l’apprentissage pour éviter l’overfitting. Le champ target_modules précise les sous-couches du modèle ciblées par LoRA, comme ici "c_attn" dans les blocs d’attention de GPT. On indique également si l’on veut entraîner les biais (bias="none") et le type de tâche (task_type="CAUSAL_LM") pour guider l’adaptation. Une fois cette configuration définie, le modèle de base (base_model) est transformé via get_peft_model() pour appliquer LoRA de manière ciblée.
 
 ---
 ```bash
@@ -117,10 +126,9 @@ lora_config = LoraConfig(
 model = get_peft_model(base_model, lora_config)
 ```
 
-### 3.2. L'entraimenent
+### 3.3. L'entraimenent
 
-Ce code configure et lance l’entraînement du modèle modifié avec LoRA à l’aide de la classe Trainer de Hugging Face. Les paramètres d’entraînement (batch size, learning rate, nombre d’époques, etc.) sont définis via TrainingArguments.
-On utilise un DataCollator adapté au language modeling causal (GPT-like), puis on entraîne le modèle sur un dataset tokenisé avec trainer.train(). L'entraînement est optimisé pour tourner sur GPU si disponible, et le modèle est sauvegardé à la fin de chaque époque.
+Ce code configure et lance l’entraînement du modèle modifié avec LoRA en utilisant la classe Trainer de la bibliothèque Hugging Face. Les paramètres d’entraînement sont définis via TrainingArguments, qui permet de spécifier notamment la taille des batches par appareil (per_device_train_batch_size), le nombre d’époques (num_train_epochs, c’est-à-dire le nombre de fois où le dataset sera parcouru), ou encore le taux d’apprentissage (learning_rate), qui contrôle la vitesse d’ajustement des poids lors de la descente de gradient. Des paramètres comme logging_dir et logging_steps permettent de gérer la journalisation de l’entraînement (en sauvegardant régulièrement les métriques de performance). Pour adapter l’entraînement au language modeling causal (comme avec les modèles de type GPT), un DataCollatorForLanguageModeling est utilisé afin de préparer dynamiquement les batches d’exemples tokenisés. Le modèle, enrichi par LoRA, est ensuite entraîné sur ce dataset via trainer.train(), avec une gestion automatique des ressources matérielles (utilisation du GPU si disponible), et une sauvegarde automatique du modèle à la fin de chaque époque. La classe Trainer prend en charge l’ensemble de la boucle d’apprentissage (calcul de la perte, mises à jour des paramètres, checkpoints, etc.), rendant le processus d’entraînement à la fois modulaire, simple à mettre en place et reproductible.
 
 
 ---
